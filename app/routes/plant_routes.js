@@ -31,6 +31,7 @@ const router = express.Router()
 // GET /plants
 router.get('/plants', requireToken, (req, res, next) => {
   Plant.find()
+    .populate('owner')
     .then(plants => {
       // `plants` will be an array of Mongoose documents
       // we want to convert each one to a POJO, so we use `.map` to
@@ -48,6 +49,7 @@ router.get('/plants', requireToken, (req, res, next) => {
 router.get('/plants/:id', requireToken, (req, res, next) => {
   // req.params.id will be set based on the `:id` in the route
   Plant.findById(req.params.id)
+    .populate('owner')
     .then(handle404)
     // if `findById` is succesful, respond with 200 and "plant" JSON
     .then(plant => res.status(200).json({ plant: plant.toObject() }))
@@ -80,6 +82,7 @@ router.patch('/plants/:id', requireToken, removeBlanks, (req, res, next) => {
   delete req.body.plant.owner
 
   Plant.findById(req.params.id)
+    .populate('owner')
     .then(handle404)
     .then(plant => {
       // pass the `req` object and the Mongoose record to `requireOwnership`
